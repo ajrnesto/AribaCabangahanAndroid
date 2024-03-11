@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imgIncident"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_corner_radius="8dp" />
+
+    <TextView
+        android:id="@+id/tvFileSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:fontFamily="@font/gabarito_regular"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/imgIncident"
+        app:layout_constraintTop_toTopOf="@+id/imgIncident"
+        tools:text="8 MB" />
+
+    <TextView
+        android:id="@+id/tvFileType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/gabarito_bold"
+        android:textColor="@color/white"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imgIncident"
+        app:layout_constraintEnd_toEndOf="@+id/imgIncident"
+        tools:text="video" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRemove"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Remove"
+        android:backgroundTint="?colorSecondary"
+        app:cornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/imgIncident"
+        app:layout_constraintStart_toStartOf="@+id/imgIncident"
+        app:layout_constraintTop_toBottomOf="@+id/imgIncident" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

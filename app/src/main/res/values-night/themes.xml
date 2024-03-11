@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Barangay360" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/majestic_blue</item>
+        <item name="colorPrimaryVariant">@color/majestic_blue</item>
+        <item name="colorOnPrimary">@color/rice_cake</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/terracotta</item>
+        <item name="colorSecondaryVariant">@color/terracotta</item>
+        <item name="colorOnSecondary">@color/rice_cake</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/rice_cake</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/rice_cake</item>
+    </style>
+</resources>

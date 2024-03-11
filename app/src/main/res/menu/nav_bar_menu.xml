@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item android:id="@+id/miAnnouncements"
+            android:icon="@drawable/bullhorn_solid"
+            android:title="Announcements" />
+
+        <item android:id="@+id/miDocumentRequests"
+            android:icon="@drawable/file_lines_solid"
+            android:title="Document Requests" />
+
+        <item android:id="@+id/miIncidentReport"
+            android:icon="@drawable/flag_solid"
+            android:title="Incident Report" />
+
+        <item android:id="@+id/miCrimeReport"
+            android:icon="@drawable/handcuffs_solid"
+            android:title="Crime Report" />
+
+        <!--item android:id="@+id/miAboutUs"
+            android:icon="@drawable/handcuffs_solid"
+            android:title="About" /-->
+
+        <item android:id="@+id/miProfile"
+            android:icon="@drawable/user_solid"
+            android:title="My Profile" />
+    </group>
+</menu>

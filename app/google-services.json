@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "134797484323",
+    "project_id": "barangay360",
+    "storage_bucket": "barangay360.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134797484323:android:667b0290bb58bead196c96",
+        "android_client_info": {
+          "package_name": "com.barangay360"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhWfQZIBF82PY28J1GteEESGIl8P4pTLw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

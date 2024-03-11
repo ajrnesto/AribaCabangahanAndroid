@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="barangay360.Drawer" parent="">
+        <item name="fontFamily">@font/gabarito_medium</item>
+    </style>
+
+    <style name="barangay360.NavigationView" parent="Widget.Material3.NavigationView">
+        <item name="itemTextAppearance">@style/barangay360.NavigationView.TextAppearance</item>
+        <item name="itemTextColor">@color/selector_nav_fg</item>
+        <item name="itemIconTint">@color/selector_nav_fg</item>
+        <item name="itemShapeFillColor">@color/selector_nav_bg</item>
+        <item name="cornerSize">8dp</item>
+        <item name="itemVerticalPadding">20dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.NavigationView.Item" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="barangay360.NavigationView.TextAppearance" parent="">
+        <item name="fontFamily">@font/gabarito_medium</item>
+        <item name="android:textColor">@color/terracotta</item>
+    </style>
+
+    <!--<style name="Fullscreen" parent="">
+        <item name="fullscreenBackgroundColor">@color/surface_beige</item>
+        <item name="fullscreenTextColor">@color/surface_beige</item>
+    </style>-->
+</resources>
