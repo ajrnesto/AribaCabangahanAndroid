@@ -58,6 +58,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.reques
         String documentType = requests.getDocumentType();
 
         loadDocType(holder, documentType);
+        holder.tvName.setText(firstName + " " + lastName);
         loadTimestamp(holder, timestamp);
         loadStatus(holder, status);
     }
@@ -108,19 +109,20 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.reques
     public class requestsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         OnRequestsListener onRequestsListener;
-        TextView tvTimestamp, tvDocumentName, tvStatus;
+        TextView tvName, tvTimestamp, tvDocumentName, tvStatus;
         MaterialButton btnCancel;
 
         public requestsViewHolder(@NonNull View itemView, OnRequestsListener onRequestsListener) {
             super(itemView);
 
+            tvName = itemView.findViewById(R.id.tvName);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
             tvDocumentName = itemView.findViewById(R.id.tvDocumentName);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             btnCancel = itemView.findViewById(R.id.btnCancel);
 
             this.onRequestsListener = onRequestsListener;
-            // itemView.setOnClickListener(this);
+            itemView.setOnClickListener(this);
 
             btnCancel.setOnClickListener(view -> {
                 MaterialAlertDialogBuilder dialogCancel = new MaterialAlertDialogBuilder(itemView.getContext());

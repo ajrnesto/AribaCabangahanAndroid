@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,7 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class IncidentReportFragment extends Fragment implements IncidentsAdapter.OnIncidentsListener {
+public class BlotterFragment extends Fragment implements IncidentsAdapter.OnIncidentsListener {
 
     FirebaseFirestore DB;
     FirebaseAuth AUTH;
@@ -43,112 +44,111 @@ public class IncidentReportFragment extends Fragment implements IncidentsAdapter
         USER = AUTH.getCurrentUser();
     }
     View view;
-    TabLayout tlIncidentReports;
+    TabLayout tlBlotter;
     ExtendedFloatingActionButton btnReportIncident;
 
-    ArrayList<Incident> arrIncidents;
-    IncidentsAdapter incidentsAdapter;
-    IncidentsAdapter.OnIncidentsListener onIncidentsListener = this;
+    ArrayList<Incident> arrBlotters;
+    IncidentsAdapter blottersBlotters;
+    IncidentsAdapter.OnIncidentsListener onBlottersListener = this;
     TextView tvEmpty;
 
-
-    RecyclerView rvIncidentReports;
+    RecyclerView rvBlotter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_incident_report, container, false);
+        view = inflater.inflate(R.layout.fragment_blotter, container, false);
 
         initializeFirebase();
         initializeViews();
-        loadRecyclerView(tlIncidentReports.getSelectedTabPosition());
+        loadRecyclerView(tlBlotter.getSelectedTabPosition());
         handleUserInteraction();
 
         return view;
     }
 
     private void initializeViews() {
-        rvIncidentReports = view.findViewById(R.id.rvIncidentReports);
+        rvBlotter = view.findViewById(R.id.rvBlotter);
         btnReportIncident = view.findViewById(R.id.btnReportIncident);
-        tlIncidentReports = view.findViewById(R.id.tlIncidentReports);
-        tlIncidentReports = view.findViewById(R.id.tlIncidentReports);
+        tlBlotter = view.findViewById(R.id.tlBlotter);
         tvEmpty = view.findViewById(R.id.tvEmpty);
     }
 
     private void loadRecyclerView(int tabIndex) {
-        arrIncidents = new ArrayList<>();
-        rvIncidentReports = view.findViewById(R.id.rvIncidentReports);
-        rvIncidentReports.setHasFixedSize(true);
+        arrBlotters = new ArrayList<>();
+        rvBlotter = view.findViewById(R.id.rvBlotter);
+        rvBlotter.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
-        rvIncidentReports.setLayoutManager(linearLayoutManager);
+        rvBlotter.setLayoutManager(linearLayoutManager);
 
-        CollectionReference refIncidents = DB.collection("incidents");
-        Query qryIncidents = null;
+        CollectionReference refBlotters = DB.collection("blotter");
+        Query qryBlotters = null;
 
         if (tabIndex == 0) {
-            qryIncidents = refIncidents.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "PENDING").orderBy("timestamp", Query.Direction.ASCENDING);
+            qryBlotters = refBlotters.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "PENDING").orderBy("timestamp", Query.Direction.ASCENDING);
         }
+        /*else if (tabIndex == 1) {
+            qryBlotters = refBlotters.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "HEARING SCHEDULED").orderBy("timestamp", Query.Direction.ASCENDING);
+        }*/
         else if (tabIndex == 1) {
-            qryIncidents = refIncidents.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "HEARING SCHEDULED").orderBy("timestamp", Query.Direction.ASCENDING);
-        }
-        else if (tabIndex == 2) {
-            qryIncidents = refIncidents.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "UNDER INVESTIGATION").orderBy("timestamp", Query.Direction.ASCENDING);
+            qryBlotters = refBlotters.whereEqualTo("userUid", AUTH.getUid()).whereEqualTo("status", "UNDER INVESTIGATION").orderBy("timestamp", Query.Direction.ASCENDING);
         }
         else {
-            qryIncidents = refIncidents.whereEqualTo("userUid", AUTH.getUid()).whereIn("status", Arrays.asList("RESOLVED", "CLOSED")).orderBy("timestamp", Query.Direction.ASCENDING);
+            qryBlotters = refBlotters.whereEqualTo("userUid", AUTH.getUid()).whereIn("status", Arrays.asList("RESOLVED", "CLOSED")).orderBy("timestamp", Query.Direction.ASCENDING);
         }
 
-        qryIncidents.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        qryBlotters.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                arrIncidents.clear();
+                arrBlotters.clear();
 
                 if (queryDocumentSnapshots == null) {
                     return;
                 }
 
                 for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
-                    Incident incident = documentSnapshot.toObject(Incident.class);
+                    Incident blotter = documentSnapshot.toObject(Incident.class);
 
-                    arrIncidents.add(incident);
-                    incidentsAdapter.notifyDataSetChanged();
+                    arrBlotters.add(blotter);
+                    blottersBlotters.notifyDataSetChanged();
                 }
 
-                if (arrIncidents.isEmpty()) {
-                    rvIncidentReports.setVisibility(View.GONE);
+                if (arrBlotters.isEmpty()) {
+                    rvBlotter.setVisibility(View.GONE);
                     tvEmpty.setVisibility(View.VISIBLE);
-                    if (tlIncidentReports.getSelectedTabPosition() == 0) {
-                        tvEmpty.setText("You have no pending incident reports");
+
+                    if (tlBlotter.getSelectedTabPosition() == 0) {
+                        tvEmpty.setText("You have no pending reports");
                     }
-                    else if (tlIncidentReports.getSelectedTabPosition() == 1) {
+                    /*else if (tlBlotter.getSelectedTabPosition() == 1) {
                         tvEmpty.setText("You have no reports scheduled for hearing");
-                    }
-                    else if (tlIncidentReports.getSelectedTabPosition() == 2) {
+                    }*/
+                    else if (tlBlotter.getSelectedTabPosition() == 1) {
                         tvEmpty.setText("You have no reports under investigation");
                     }
-                    else if (tlIncidentReports.getSelectedTabPosition() == 3) {
+                    else {
                         tvEmpty.setText("You have no resolved reports");
                     }
                 }
                 else {
-                    rvIncidentReports.setVisibility(View.VISIBLE);
+                    rvBlotter.setVisibility(View.VISIBLE);
                     tvEmpty.setVisibility(View.GONE);
                 }
             }
         });
 
-        incidentsAdapter = new IncidentsAdapter(getContext(), arrIncidents, onIncidentsListener);
-        rvIncidentReports.setAdapter(incidentsAdapter);
-        incidentsAdapter.notifyDataSetChanged();
+        blottersBlotters = new IncidentsAdapter(getContext(), arrBlotters, onBlottersListener);
+        rvBlotter.setAdapter(blottersBlotters);
+        blottersBlotters.notifyDataSetChanged();
     }
 
     private void handleUserInteraction() {
-        tlIncidentReports.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tlBlotter.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                loadRecyclerView(tlIncidentReports.getSelectedTabPosition());
+                loadRecyclerView(tlBlotter.getSelectedTabPosition());
             }
 
             @Override
@@ -165,15 +165,15 @@ public class IncidentReportFragment extends Fragment implements IncidentsAdapter
         btnReportIncident.setOnClickListener(view -> {
             FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            Fragment incidentReportFragment = new FormIncidentReportFragment();
-            fragmentTransaction.replace(R.id.fragmentHolder, incidentReportFragment, "INCIDENT_REPORT_FORM_FRAGMENT");
-            fragmentTransaction.addToBackStack("INCIDENT_REPORT_FORM_FRAGMENT");
+            Fragment formBlotterReportFragment = new FormBlotterFragment();
+            fragmentTransaction.replace(R.id.fragmentHolder, formBlotterReportFragment, "CRIME_REPORT_FORM_FRAGMENT");
+            fragmentTransaction.addToBackStack("CRIME_REPORT_FORM_FRAGMENT");
             fragmentTransaction.commit();
         });
     }
 
     @Override
     public void onIncidentsClick(int position) {
-        
+
     }
 }

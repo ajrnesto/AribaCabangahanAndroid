@@ -204,7 +204,7 @@ public class FormResidencyFragment extends Fragment {
     private void validateResidencyForm() {
         btnSubmit.setEnabled(false);
         if (etFirstName.getText().toString().isEmpty() ||
-                etMiddleName.getText().toString().isEmpty() ||
+                // etMiddleName.getText().toString().isEmpty() ||
                 etLastName.getText().toString().isEmpty() ||
                 etBirthdate.getText().toString().isEmpty() ||
                 etAddressPurok.getText().toString().isEmpty() ||

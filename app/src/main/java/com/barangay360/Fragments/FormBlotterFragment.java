@@ -1,19 +1,15 @@
 package com.barangay360.Fragments;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +23,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.barangay360.Adapters.ImagePreviewAdapter;
-import com.barangay360.Adapters.ImagePreviewAdapter;
 import com.barangay360.Adapters.InvolvedPersonAdapter;
-import com.barangay360.Objects.Incident;
 import com.barangay360.Objects.InvolvedPerson;
-import com.barangay360.Objects.Request;
 import com.barangay360.R;
+import com.barangay360.SelectLocationActivity;
+import com.barangay360.Utils.Utils;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,7 +37,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -50,18 +45,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class FormIncidentReportFragment extends Fragment implements ImagePreviewAdapter.OnImagePreviewListener, InvolvedPersonAdapter.OnInvolvedPersonListener {
+public class FormBlotterFragment extends Fragment implements ImagePreviewAdapter.OnImagePreviewListener, InvolvedPersonAdapter.OnInvolvedPersonListener {
 
     FirebaseFirestore DB;
     FirebaseStorage STORAGE;
@@ -91,7 +84,7 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
 
     CircularProgressIndicator progressUploading;
     TextView tvUploading;
-    TextInputEditText etIncidentDate, etLocationPurok, etIncidentDetails;
+    TextInputEditText etIncidentDate, etLocationPurok, etIncidentDetails, etLocation;
     AutoCompleteTextView menuIncidentType;
     RecyclerView rvMedia, rvInvolvedPersons;
     MaterialButton btnAddInvolvedPerson, btnAddMedia, btnSubmit;
@@ -108,7 +101,7 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_form_incident_report, container, false);
+        view = inflater.inflate(R.layout.fragment_form_blotter, container, false);
 
         initializeFirebase();
         initializeViews();
@@ -120,12 +113,41 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Utils.Cache.setBoolean(requireContext(), "appointment_items_selection_mode", false);
+
+        double latitude = Utils.Cache.getDouble(requireContext(), "selected_latitude");
+        double longitude = Utils.Cache.getDouble(requireContext(), "selected_longitude");
+        String addressLine = Utils.Cache.getString(requireContext(), "addressLine");
+
+        if (latitude == 0 || longitude == 0) {
+            Objects.requireNonNull(etLocation.getText()).clear();
+            return;
+        }
+
+        etLocation.setText(addressLine);
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Utils.Cache.removeKey(requireContext(), "selected_latitude");
+        Utils.Cache.removeKey(requireContext(), "selected_longitude");
+        Utils.Cache.removeKey(requireContext(), "addressLine");
+    }
+
     private void initializeViews() {
         clProgress = view.findViewById(R.id.clProgress);
         progressUploading = view.findViewById(R.id.progressUploading);
         tvUploading = view.findViewById(R.id.tvUploading);
         etIncidentDate = view.findViewById(R.id.etIncidentDate);
         etLocationPurok = view.findViewById(R.id.etLocationPurok);
+        etLocation = view.findViewById(R.id.etLocation);
         etIncidentDetails = view.findViewById(R.id.etIncidentDetails);
         menuIncidentType = view.findViewById(R.id.menuIncidentType);
         rvMedia = view.findViewById(R.id.rvMedia);
@@ -164,8 +186,7 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
     }
 
     private void initializeSpinners() {
-        // civil status
-        itemsIncidentType = new String[]{"ANIMAL CONTROL", "DOMESTIC DISPUTES", "FIRE INCIDENT", "HARASSMENT AND THREAT", "ILLEGAL PARKING", "MISSING PERSONS", "NOISE COMPLAINTS", "PUBLIC DISTURBANCES", "THEFT AND BURGLARY", "TRAFFIC ACCIDENTS", "VANDALISM", "OTHER"};
+        itemsIncidentType = new String[]{"Burglary","Child Abuse","Disturbance","Domestic Disputes","Drug-related","Fraud","Harassment","Illegal Gambling","Juvenile Delinquency","Missing Person","Noise Complaints","Petty Quarrels","Physical Altercation","Property Damage","Public Indecency","Public Intoxication","Public Nuisance","Theft","Traffic Violations","Trespassing","Other"};
         adapterIncidentType = new ArrayAdapter<>(requireContext(), R.layout.list_item, itemsIncidentType);
         menuIncidentType.setAdapter(adapterIncidentType);
     }
@@ -198,6 +219,13 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
             }
         });
 
+        etLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(requireActivity(), SelectLocationActivity.class));
+            }
+        });
+
         btnAddMedia.setOnClickListener(view -> selectImageFromDevice());
 
         btnSubmit.setOnClickListener(view -> validateIncidentReportForm());
@@ -226,32 +254,30 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
             btnSubmit.setEnabled(true);
             return;
         }
+        int emptyInvolvedPersonFields = 0;
         for (int i = 0; i < rvInvolvedPersons.getAdapter().getItemCount(); i++) {
             View itemView = rvInvolvedPersons.getChildAt(i);
             TextInputEditText etFullName = itemView.findViewById(R.id.etFullName);
             TextInputEditText etFullAddress = itemView.findViewById(R.id.etFullAddress);
-            AutoCompleteTextView menuInvolvement = itemView.findViewById(R.id.menuInvolvement);
 
             String fullName = etFullName.getText().toString().toUpperCase();
             String fullAddress = etFullAddress.getText().toString().toUpperCase();
-            String involvement = menuInvolvement.getText().toString().toUpperCase();
 
-            if (fullName.isEmpty() || fullAddress.isEmpty() || involvement.isEmpty()) {
+            if (fullName.isEmpty() || fullAddress.isEmpty()) {
                 Toast.makeText(requireContext(), "Please complete all involved persons' information", Toast.LENGTH_SHORT).show();
                 btnSubmit.setEnabled(true);
                 return;
             }
             arrInvolvedPerson.get(i).setFullName(fullName);
             arrInvolvedPerson.get(i).setFullAddress(fullAddress);
-            arrInvolvedPerson.get(i).setInvolvement(involvement);
 
             Log.d("TAG", "etFullName: "+etFullName.getText().toString().toUpperCase()+"\n etFullAddress: "+etFullAddress.getText().toString().toUpperCase());
         }
 
-        String incidentType = menuIncidentType.getText().toString().toUpperCase();
-        long incidentDate = dpIncidentDateSelection;
+        String crimeType = menuIncidentType.getText().toString().toUpperCase();
+        long crimeDate = dpIncidentDateSelection;
         String locationPurok = etLocationPurok.getText().toString().toUpperCase();
-        String incidentDetails = etIncidentDetails.getText().toString().toUpperCase();
+        String crimeDetails = etIncidentDetails.getText().toString().toUpperCase();
 
         // store media file names
         ArrayList<String> arrMediaFileNames = new ArrayList<>();
@@ -266,22 +292,27 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
         }
 
         if (arrMediaFileNames.size() == 0) {
-            Map<String, Object> incidentReport = new HashMap<>();
-            incidentReport.put("userUid", AUTH.getUid());
-            incidentReport.put("incidentType", incidentType);
-            incidentReport.put("incidentDate", incidentDate);
-            incidentReport.put("locationPurok", locationPurok);
-            incidentReport.put("incidentDetails", incidentDetails);
-            incidentReport.put("involvedPersons", arrInvolvedPerson);
-            incidentReport.put("involvedPersonsSearchKeys", arrInvolvedPersonSearchKeys);
-            incidentReport.put("mediaFileNames", arrMediaFileNames);
-            incidentReport.put("timestamp", System.currentTimeMillis());
-            incidentReport.put("status", "PENDING");
+            Map<String, Object> blotter = new HashMap<>();
+            blotter.put("userUid", AUTH.getUid());
+            blotter.put("incidentType", crimeType);
+            blotter.put("incidentDate", crimeDate);
+            blotter.put("locationPurok", locationPurok);
+            blotter.put("incidentDetails", crimeDetails);
+            blotter.put("involvedPersons", arrInvolvedPerson);
+            blotter.put("involvedPersonsSearchKeys", arrInvolvedPersonSearchKeys);
+            blotter.put("mediaFileNames", arrMediaFileNames);
+            blotter.put("timestamp", System.currentTimeMillis());
+            blotter.put("status", "PENDING");
+            HashMap<String, Object> locLatLng = new HashMap<>();
+            locLatLng.put("latitude", Utils.Cache.getDouble(requireContext(), "selected_latitude"));
+            locLatLng.put("longitude", Utils.Cache.getDouble(requireContext(), "selected_longitude"));
+            locLatLng.put("addressLine", Utils.Cache.getString(requireContext(), "addressLine"));
+            blotter.put("locationLatLng", locLatLng);
 
-            DocumentReference refIncident =  DB.collection("incidents").document();
-            incidentReport.put("uid", refIncident.getId());
+            DocumentReference refIncident =  DB.collection("blotter").document();
+            blotter.put("uid", refIncident.getId());
 
-            refIncident.set(incidentReport)
+            refIncident.set(blotter)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -296,16 +327,22 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
                     });
         }
         else {
-            Map<String, Object> incidentReport = new HashMap<>();
-            incidentReport.put("userUid", AUTH.getUid());
-            incidentReport.put("incidentType", incidentType);
-            incidentReport.put("incidentDate", incidentDate);
-            incidentReport.put("locationPurok", locationPurok);
-            incidentReport.put("incidentDetails", incidentDetails);
-            incidentReport.put("involvedPersons", arrInvolvedPerson);
-            incidentReport.put("mediaFileNames", arrMediaFileNames);
-            incidentReport.put("timestamp", System.currentTimeMillis());
-            incidentReport.put("status", "PENDING");
+            Map<String, Object> blotter = new HashMap<>();
+            blotter.put("userUid", AUTH.getUid());
+            blotter.put("incidentType", crimeType);
+            blotter.put("incidentDate", crimeDate);
+            blotter.put("locationPurok", locationPurok);
+            blotter.put("incidentDetails", crimeDetails);
+            blotter.put("involvedPersons", arrInvolvedPerson);
+            blotter.put("involvedPersonsSearchKeys", arrInvolvedPersonSearchKeys);
+            blotter.put("mediaFileNames", arrMediaFileNames);
+            blotter.put("timestamp", System.currentTimeMillis());
+            blotter.put("status", "PENDING");
+            HashMap<String, Object> locLatLng = new HashMap<>();
+            locLatLng.put("latitude", Utils.Cache.getDouble(requireContext(), "selected_latitude"));
+            locLatLng.put("longitude", Utils.Cache.getDouble(requireContext(), "selected_longitude"));
+            locLatLng.put("addressLine", Utils.Cache.getString(requireContext(), "addressLine"));
+            blotter.put("locationLatLng", locLatLng);
 
             // upload all media to firebase storage
             final int[] filesUploaded = {0};
@@ -333,10 +370,10 @@ public class FormIncidentReportFragment extends Fragment implements ImagePreview
                         if (filesUploaded[0] == arrUri.size()) {
                             clProgress.setVisibility(View.GONE);
 
-                            DocumentReference refIncident =  DB.collection("incidents").document();
-                            incidentReport.put("uid", refIncident.getId());
+                            DocumentReference refIncident =  DB.collection("blotter").document();
+                            blotter.put("uid", refIncident.getId());
 
-                            refIncident.set(incidentReport)
+                            refIncident.set(blotter)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

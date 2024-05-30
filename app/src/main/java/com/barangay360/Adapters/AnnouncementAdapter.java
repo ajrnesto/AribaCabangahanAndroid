@@ -1,16 +1,23 @@
 package com.barangay360.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.barangay360.Dialogs.RequirementsDialog;
+import com.barangay360.Dialogs.ViewImageDialog;
 import com.barangay360.Objects.Announcement;
 import com.barangay360.Objects.Announcement;
 import com.barangay360.Objects.InvolvedPerson;
@@ -20,6 +27,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.jsibbold.zoomage.ZoomageView;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -77,7 +85,7 @@ public class AnnouncementAdapter extends RecyclerView.Adapter<AnnouncementAdapte
 
     public class announcementsViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView imgBanner;
+        ZoomageView imgBanner;
         TextView tvTitle, tvTimestamp, tvContent;
 
         public announcementsViewHolder(@NonNull View itemView) {
@@ -88,17 +96,48 @@ public class AnnouncementAdapter extends RecyclerView.Adapter<AnnouncementAdapte
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
             tvContent = itemView.findViewById(R.id.tvContent);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(view -> toggleContentVisibility());
+            /*tvTitle.setOnClickListener(view -> toggleContentVisibility());
+            tvTimestamp.setOnClickListener(view -> toggleContentVisibility());*/
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View view) {
-                    if (tvContent.getVisibility() == View.VISIBLE) {
-                        tvContent.setVisibility(View.GONE);
-                    }
-                    else {
-                        tvContent.setVisibility(View.VISIBLE);
-                    }
+                public boolean onLongClick(View view) {
+                    /*Create an ACTION_SEND Intent*/
+                    Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    /*This will be the actual content you wish you share.*/
+                    String shareBody = arrAnnouncements.get(getAdapterPosition()).getTitle() + "\n\n" + arrAnnouncements.get(getAdapterPosition()).getContent();
+                    /*The type of the content is text, obviously.*/
+                    intent.setType("text/plain");
+                    /*Applying information Subject and Body.*/
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, arrAnnouncements.get(getAdapterPosition()).getTitle());
+                    intent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                    /*Fire!*/
+                    context.startActivity(Intent.createChooser(intent, "Share"));
+
+                    return false;
                 }
             });
+
+            imgBanner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ViewImageDialog viewImageDialog = new ViewImageDialog();
+                    Bundle args = new Bundle();
+                    args.putLong("thumbnail", arrAnnouncements.get(getAdapterPosition()).getThumbnail());
+                    viewImageDialog.setArguments(args);
+                    viewImageDialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "REQUIREMENTS_DIALOG");
+                }
+            });
+        }
+
+        private void toggleContentVisibility() {
+            if (tvContent.getVisibility() == View.VISIBLE) {
+                tvContent.setVisibility(View.GONE);
+            }
+            else {
+                tvContent.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

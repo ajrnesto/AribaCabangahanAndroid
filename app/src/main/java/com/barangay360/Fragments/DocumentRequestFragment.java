@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.barangay360.Adapters.RequestsAdapter;
+import com.barangay360.Dialogs.RequirementsDialog;
 import com.barangay360.Objects.Request;
 import com.barangay360.R;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,6 +55,7 @@ public class DocumentRequestFragment extends Fragment implements RequestsAdapter
     RequestsAdapter requestsAdapter;
     RequestsAdapter.OnRequestsListener onRequestsListener = this;
     TabLayout tlRequestStatus;
+    TextView tvEmpty;
 
     RecyclerView rvDocumentRequests;
     ExtendedFloatingActionButton btnRequestNewDocument;
@@ -73,6 +77,7 @@ public class DocumentRequestFragment extends Fragment implements RequestsAdapter
         btnRequestNewDocument = view.findViewById(R.id.btnRequestNewDocument);
         rvDocumentRequests = view.findViewById(R.id.rvDocumentRequests);
         tlRequestStatus = view.findViewById(R.id.tlRequestStatus);
+        tvEmpty = view.findViewById(R.id.tvEmpty);
     }
 
     private void loadRecyclerView(int tabIndex) {
@@ -112,9 +117,17 @@ public class DocumentRequestFragment extends Fragment implements RequestsAdapter
 
                 if (arrRequests.isEmpty()) {
                     rvDocumentRequests.setVisibility(View.GONE);
+                    tvEmpty.setVisibility(View.VISIBLE);
+                    if (tlRequestStatus.getSelectedTabPosition() == 0) {
+                        tvEmpty.setText("You have no pending document requests");
+                    }
+                    else {
+                        tvEmpty.setText("You have no completed document requests");
+                    }
                 }
                 else {
                     rvDocumentRequests.setVisibility(View.VISIBLE);
+                    tvEmpty.setVisibility(View.GONE);
                 }
             }
         });
@@ -154,6 +167,10 @@ public class DocumentRequestFragment extends Fragment implements RequestsAdapter
 
     @Override
     public void onRequestsClick(int position) {
-
+        RequirementsDialog requirementsDialog = new RequirementsDialog();
+        Bundle args = new Bundle();
+        args.putString("documentType", arrRequests.get(position).getDocumentType());
+        requirementsDialog.setArguments(args);
+        requirementsDialog.show(requireActivity().getSupportFragmentManager(), "REQUIREMENTS_DIALOG");
     }
 }

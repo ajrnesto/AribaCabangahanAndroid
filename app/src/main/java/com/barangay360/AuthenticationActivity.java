@@ -51,7 +51,7 @@ public class AuthenticationActivity extends AppCompatActivity {
     ConstraintLayout clSignup;
     TextInputEditText etSignupFirstName, etSignupMiddleName, etSignupLastName, etSignupBirthdate, etAddressPurok, etSignupMobile, etSignupEmail, etSignupPassword;
     AutoCompleteTextView menuCivilStatus, menuResidencyStatus;
-    MaterialButton btnSignup, btnGotoLogin;
+    MaterialButton btnSignup, btnGotoLogin, btnForgotPassword;
     
     // date picker items
     MaterialDatePicker.Builder<Long> bSchedule;
@@ -77,7 +77,12 @@ public class AuthenticationActivity extends AppCompatActivity {
 
     private void checkPreviousLoggedSession() {
         if (USER != null) {
-            startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+            if (USER.isEmailVerified()) {
+                startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+            }
+            else {
+                startActivity(new Intent(AuthenticationActivity.this, UnverifiedEmailActivity.class));
+            }
             finish();
         }
     }
@@ -114,6 +119,13 @@ public class AuthenticationActivity extends AppCompatActivity {
     }
 
     private void handleUserInteractions() {
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(AuthenticationActivity.this, ForgotPasswordActivity.class));
+            }
+        });
+
         btnSignup.setOnClickListener(view -> {
             Utils.hideKeyboard(this);
             validateRegistrationForm();
@@ -157,7 +169,12 @@ public class AuthenticationActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(AuthenticationActivity.this, "Signed in as "+email, Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+                        if (AUTH.getCurrentUser().isEmailVerified()) {
+                            startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+                        }
+                        else {
+                            startActivity(new Intent(AuthenticationActivity.this, UnverifiedEmailActivity.class));
+                        }
                         finish();
                     }
                     else {
@@ -222,7 +239,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+                                            startActivity(new Intent(AuthenticationActivity.this, UnverifiedEmailActivity.class));
                                             Utils.Cache.setInt(AuthenticationActivity.this, "user_type", 0);
                                             finish();
                                             btnSignup.setEnabled(true);
@@ -260,5 +277,6 @@ public class AuthenticationActivity extends AppCompatActivity {
         menuResidencyStatus = findViewById(R.id.menuResidencyStatus);
         btnSignup = findViewById(R.id.btnSignup);
         btnGotoLogin = findViewById(R.id.btnGotoLogin);
+        btnForgotPassword = findViewById(R.id.btnForgotPassword);
     }
 }

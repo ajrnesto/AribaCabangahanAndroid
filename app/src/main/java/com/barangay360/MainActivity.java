@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.barangay360.Fragments.AnnouncementsFragment;
+import com.barangay360.Fragments.BlotterFragment;
 import com.barangay360.Fragments.CrimeReportFragment;
 import com.barangay360.Fragments.DocumentRequestFragment;
 import com.barangay360.Fragments.IncidentReportFragment;
@@ -42,6 +43,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -112,25 +114,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void listenForDocumentRequestThatAreReadyForPickup() {
-        Query qryReadyRequests = DB.collection("requests").whereEqualTo("status", "COMPLETED");
-        qryReadyRequests.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        //If something went wrong
-                        if (e != null)
-                            Log.w("TAG", "ERROR : ", e);
+        if (USER != null) {
+            Query qryReadyRequests = DB.collection("requests")
+                    .whereEqualTo("userUid", AUTH.getUid())
+                    .whereEqualTo("status", "COMPLETED");
+            qryReadyRequests.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                    //If something went wrong
+                    if (e != null)
+                        Log.w("TAG", "ERROR : ", e);
 
-                        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
-                            //Instead of simply using the entire query snapshot
-                            //See the actual changes to query results between query snapshots (added, removed, and modified)
-                            for (DocumentChange docChange : queryDocumentSnapshots.getDocumentChanges()) {
-                                if (docChange.getType() == DocumentChange.Type.ADDED) {
-                                    buildNotification();
-                                }
+                    int notificationCounter = 0;
+                    if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                        // check individual snapshots for requests that have not yet been notified to the user.
+                        for (DocumentSnapshot docSnap : queryDocumentSnapshots) {
+                            if (!docSnap.contains("wasNotified")) {
+                                DB.collection("requests").document(docSnap.getId())
+                                        .update("wasNotified", true);
+                                notificationCounter++;
                             }
                         }
                     }
-                });
+
+                    if (notificationCounter > 0) {
+                        buildNotification();
+                    }
+                }
+            });
+        }
     }
 
     private void checkNotificationPermsission() {
@@ -164,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
         miCrimeReport = findViewById(R.id.miCrimeReport);
         // miAboutUs = findViewById(R.id.miAboutUs);
         miProfile = findViewById(R.id.miProfile);*/
+
+        tvActivityTitle.setText("Barangay Announcements");
     }
 
     private void handleUserInteraction() {
@@ -269,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                     drawerLayout.close();
                 }
             }
-            else if (item.getItemId() == R.id.miIncidentReport) {
+            /*else if (item.getItemId() == R.id.miIncidentReport) {
                 Utils.hideKeyboard(this);
                 if (USER == null){
                     Utils.loginRequiredDialog(MainActivity.this, navView, "To submit blotters and report incidents, please log in or sign up first.");
@@ -295,6 +309,36 @@ public class MainActivity extends AppCompatActivity {
                     Fragment crimeReportFragment = new CrimeReportFragment();
                     fragmentTransaction.replace(R.id.fragmentHolder, crimeReportFragment, "CRIME_REPORT_FRAGMENT");
                     fragmentTransaction.addToBackStack("CRIME_REPORT_FRAGMENT");
+                    fragmentTransaction.commit();
+                    drawerLayout.close();
+                }
+            }*/
+            else if (item.getItemId() == R.id.miCrimesIncidents) {
+                Utils.hideKeyboard(this);
+                if (USER == null){
+                    Utils.loginRequiredDialog(MainActivity.this, navView, "To report an incident or crime, please log in or sign up first.");
+                    return false;
+                }
+                if (Objects.requireNonNull(navView.getCheckedItem()).getItemId() != R.id.miCrimesIncidents) {
+
+                    Fragment crimeReportFragment = new BlotterFragment();
+                    fragmentTransaction.replace(R.id.fragmentHolder, crimeReportFragment, "BLOTTER_FRAGMENT");
+                    fragmentTransaction.addToBackStack("BLOTTER_FRAGMENT");
+                    fragmentTransaction.commit();
+                    drawerLayout.close();
+                }
+            }
+            else if (item.getItemId() == R.id.miBlotter) {
+                Utils.hideKeyboard(this);
+                if (USER == null){
+                    Utils.loginRequiredDialog(MainActivity.this, navView, "In order to blotter, please log in or sign up first.");
+                    return false;
+                }
+                if (Objects.requireNonNull(navView.getCheckedItem()).getItemId() != R.id.miBlotter) {
+
+                    Fragment incidentReportFragment = new IncidentReportFragment();
+                    fragmentTransaction.replace(R.id.fragmentHolder, incidentReportFragment, "INCIDENT_REPORT_FRAGMENT");
+                    fragmentTransaction.addToBackStack("INCIDENT_REPORT_FRAGMENT");
                     fragmentTransaction.commit();
                     drawerLayout.close();
                 }
@@ -339,7 +383,8 @@ public class MainActivity extends AppCompatActivity {
             ProfileFragment profileFragment = (ProfileFragment) getSupportFragmentManager().findFragmentByTag("PROFILE_FRAGMENT");
             DocumentRequestFragment documentRequestFragment = (DocumentRequestFragment) getSupportFragmentManager().findFragmentByTag("DOCUMENT_REQUEST_FRAGMENT");
             AnnouncementsFragment announcementsFragment = (AnnouncementsFragment) getSupportFragmentManager().findFragmentByTag("ANNOUNCEMENTS_FRAGMENT");
-            CrimeReportFragment crimeReportFragment = (CrimeReportFragment) getSupportFragmentManager().findFragmentByTag("CRIME_REPORT_FRAGMENT");
+            BlotterFragment blotterFragment = (BlotterFragment) getSupportFragmentManager().findFragmentByTag("BLOTTER_FRAGMENT");
+            /*CrimeReportFragment crimeReportFragment = (CrimeReportFragment) getSupportFragmentManager().findFragmentByTag("CRIME_REPORT_FRAGMENT");*/
             IncidentReportFragment incidentReportFragment = (IncidentReportFragment) getSupportFragmentManager().findFragmentByTag("INCIDENT_REPORT_FRAGMENT");
 
             if (profileFragment != null && profileFragment.isVisible()) {
@@ -357,13 +402,18 @@ public class MainActivity extends AppCompatActivity {
                 // bottom_navbar.getMenu().getItem(2).setChecked(true);
                 softKeyboardListener();
             }
-            else if (crimeReportFragment != null && crimeReportFragment.isVisible()) {
+            /*else if (crimeReportFragment != null && crimeReportFragment.isVisible()) {
                 tvActivityTitle.setText("Report a Crime");
                 // bottom_navbar.getMenu().getItem(1).setChecked(true);
                 softKeyboardListener();
-            }
+            }*/
             else if (incidentReportFragment != null && incidentReportFragment.isVisible()) {
-                tvActivityTitle.setText("Report an Incident");
+                tvActivityTitle.setText("Barangay Blotter");
+                // bottom_navbar.getMenu().getItem(0).setChecked(true);
+                softKeyboardListener();
+            }
+            else if (blotterFragment != null && blotterFragment.isVisible()) {
+                tvActivityTitle.setText("Crimes/Incidents");
                 // bottom_navbar.getMenu().getItem(0).setChecked(true);
                 softKeyboardListener();
             }

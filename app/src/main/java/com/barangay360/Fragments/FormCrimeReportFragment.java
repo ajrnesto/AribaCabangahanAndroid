@@ -45,6 +45,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class FormCrimeReportFragment extends Fragment implements ImagePreviewAda
 
     ArrayList<Uri> arrUri = new ArrayList<>();
     ArrayList<InvolvedPerson> arrInvolvedPerson = new ArrayList<>();
+    ArrayList<String> arrInvolvedPersonSearchKeys = new ArrayList<>();
     ImagePreviewAdapter imagePreviewAdapter;
     ImagePreviewAdapter.OnImagePreviewListener onImagePreviewListener = this;
     InvolvedPersonAdapter involvedPersonAdapter;
@@ -138,7 +140,6 @@ public class FormCrimeReportFragment extends Fragment implements ImagePreviewAda
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(requireContext(), "yep", Toast.LENGTH_SHORT).show();
                     String firstName = task.getResult().getString("firstName");
                     String middleName = task.getResult().getString("middleName");
                     String lastName = task.getResult().getString("lastName");
@@ -244,6 +245,12 @@ public class FormCrimeReportFragment extends Fragment implements ImagePreviewAda
             arrMediaFileNames.add(uri.getLastPathSegment()+System.currentTimeMillis());
         }
 
+        arrInvolvedPersonSearchKeys.clear();
+        for (InvolvedPerson involvedPerson : arrInvolvedPerson) {
+            String fullName = involvedPerson.getFullName();
+            arrInvolvedPersonSearchKeys.addAll(Arrays.asList(fullName.split(" ")));
+        }
+
         if (arrMediaFileNames.size() == 0) {
             Map<String, Object> crimeReport = new HashMap<>();
             crimeReport.put("userUid", AUTH.getUid());
@@ -252,6 +259,7 @@ public class FormCrimeReportFragment extends Fragment implements ImagePreviewAda
             crimeReport.put("locationPurok", locationPurok);
             crimeReport.put("incidentDetails", crimeDetails);
             crimeReport.put("involvedPersons", arrInvolvedPerson);
+            crimeReport.put("involvedPersonsSearchKeys", arrInvolvedPersonSearchKeys);
             crimeReport.put("mediaFileNames", arrMediaFileNames);
             crimeReport.put("timestamp", System.currentTimeMillis());
             crimeReport.put("status", "PENDING");

@@ -94,6 +94,7 @@
                 android:backgroundTint="?colorOnPrimary"
                 android:fontFamily="@font/gabarito_regular"
                 android:paddingVertical="16dp"
+                android:visibility="gone"
                 android:text="Barangay Business Permit"
                 android:textColor="?colorPrimary"
                 app:cornerRadius="0dp"

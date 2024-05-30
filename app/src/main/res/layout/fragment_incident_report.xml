@@ -43,6 +43,17 @@
 
         </com.google.android.material.tabs.TabLayout>
 
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/gabarito_regular"
+            android:text="You have no pending incident reports"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tlIncidentReports" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvIncidentReports"
             android:layout_width="match_parent"

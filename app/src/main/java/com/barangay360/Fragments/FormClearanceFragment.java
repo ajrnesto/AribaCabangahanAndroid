@@ -67,9 +67,9 @@ public class FormClearanceFragment extends Fragment {
 
     ActivityResultLauncher<Intent> activityResultLauncher;
     ScrollView svForm, svNonResidentRequirements;
-    TextInputEditText etFirstName, etMiddleName, etLastName, etBirthdate, etAddressPurok, etPurpose, etLetterOfRequest;
+    TextInputEditText etFirstName, etMiddleName, etLastName, etBirthdate, etAddressPurok, etLetterOfRequest;
     RoundedImageView imgId, imgCedula;
-    AutoCompleteTextView menuCivilStatus, menuResidencyStatus;
+    AutoCompleteTextView menuCivilStatus, menuResidencyStatus, menuPurpose;
     MaterialRadioButton radioResident;
     MaterialButton btnSubmit, btnUploadId, btnUploadCedula, btnSubmitVerification;
 
@@ -82,8 +82,8 @@ public class FormClearanceFragment extends Fragment {
     String currentImageSelectCode = "";
 
     // Spinner items
-    String[] itemsCivilStatus, itemsResidencyStatus;
-    ArrayAdapter<String> adapterCivilStatus, adapterResidencyStatus;
+    String[] itemsCivilStatus, itemsResidencyStatus, itemPurpose;
+    ArrayAdapter<String> adapterCivilStatus, adapterResidencyStatus, adapterPurpose;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,7 +111,7 @@ public class FormClearanceFragment extends Fragment {
         menuCivilStatus = view.findViewById(R.id.menuCivilStatus);
         etAddressPurok = view.findViewById(R.id.etAddressPurok);
         menuResidencyStatus = view.findViewById(R.id.menuResidencyStatus);
-        etPurpose = view.findViewById(R.id.etPurpose);
+        menuPurpose = view.findViewById(R.id.menuPurpose);
         radioResident = view.findViewById(R.id.radioResident);
         btnSubmit = view.findViewById(R.id.btnSubmit);
         // verification
@@ -130,9 +130,14 @@ public class FormClearanceFragment extends Fragment {
         menuCivilStatus.setAdapter(adapterCivilStatus);
 
         // residency
-        itemsResidencyStatus = new String[]{"PERMANENTLY RESIDING", "PRESENTLY RESIDING"};
+        itemsResidencyStatus = new String[]{"PERMANENT ADDRESS", "PRESENT ADDRESS", "BUSINESS ADDRESS"};
         adapterResidencyStatus = new ArrayAdapter<>(requireContext(), R.layout.list_item, itemsResidencyStatus);
         menuResidencyStatus.setAdapter(adapterResidencyStatus);
+
+        // purpose
+        itemPurpose = new String[]{"EMPLOYMENT", "RESIDENCY VERIFICATION", "BUSINESS PERMIT/LICENSES", "SCHOOL REFERENCE", "OVERSEAS TRAVEL", "MARRIAGE LICENSE", "LOAN APPLICATION"};
+        adapterPurpose = new ArrayAdapter<>(requireContext(), R.layout.list_item, itemPurpose);
+        menuPurpose.setAdapter(adapterPurpose);
     }
 
     private void initializeDatePicker() {
@@ -205,20 +210,19 @@ public class FormClearanceFragment extends Fragment {
     private void validateClearanceForm() {
         btnSubmit.setEnabled(false);
         if (etFirstName.getText().toString().isEmpty() ||
-                etMiddleName.getText().toString().isEmpty() ||
                 etLastName.getText().toString().isEmpty() ||
                 etBirthdate.getText().toString().isEmpty() ||
                 etAddressPurok.getText().toString().isEmpty() ||
-                etPurpose.getText().toString().isEmpty() ||
+                menuPurpose.getText().toString().isEmpty() ||
                 menuCivilStatus.getText().toString().isEmpty() ||
                 menuResidencyStatus.getText().toString().isEmpty())
         {
-            Toast.makeText(requireContext(), "Please fill out all the fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Please fill out all the required fields", Toast.LENGTH_SHORT).show();
             btnSubmit.setEnabled(true);
             return;
         }
 
-        boolean userIsResident = radioResident.isChecked();
+        /*boolean userIsResident = radioResident.isChecked();
         if (!userIsResident) {
             Utils.hideKeyboard(requireActivity());
             svForm.setVisibility(View.GONE);
@@ -230,7 +234,7 @@ public class FormClearanceFragment extends Fragment {
             dialogNonResident.setPositiveButton("I Understand", (dialogInterface, i) -> {});
             dialogNonResident.show();
             return;
-        }
+        }*/
 
         submitForm();
     }
@@ -255,7 +259,7 @@ public class FormClearanceFragment extends Fragment {
         String lastName = etLastName.getText().toString().toUpperCase();
         long birthdate = dpScheduleSelection;
         String addressPurok = etAddressPurok.getText().toString().toUpperCase();
-        String purpose = etPurpose.getText().toString().toUpperCase();
+        String purpose = menuPurpose.getText().toString().toUpperCase();
         String civilStatus = menuCivilStatus.getText().toString();
         String residencyStatus = menuResidencyStatus.getText().toString();
         String letterOfRequest;
@@ -280,29 +284,29 @@ public class FormClearanceFragment extends Fragment {
 
         boolean userIsResident = radioResident.isChecked();
         if (!userIsResident) {
-            letterOfRequest = etLetterOfRequest.getText().toString();
+            // letterOfRequest = etLetterOfRequest.getText().toString();
             clearanceRequest.put("isNonResident", true);
-            clearanceRequest.put("letterOfRequest", letterOfRequest);
+            // clearanceRequest.put("letterOfRequest", letterOfRequest);
 
-            StorageReference sRefId = STORAGE.getReference().child("id/"+refRequest.getId());
-            sRefId.putFile(uriSelectedForId).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            // StorageReference sRefId = STORAGE.getReference().child("id/"+refRequest.getId());
+            /*sRefId.putFile(uriSelectedForId).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(requireContext(), "Failed to upload ID. Please try again.", Toast.LENGTH_SHORT).show();
                         btnSubmitVerification.setEnabled(true);
                     }
-                    else if (task.isSuccessful()) {
-                        StorageReference sRefCedula = STORAGE.getReference().child("cedula/"+refRequest.getId());
-                        sRefCedula.putFile(uriSelectedForCedula).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    else if (task.isSuccessful()) {*/
+                        // StorageReference sRefCedula = STORAGE.getReference().child("cedula/"+refRequest.getId());
+                        /*sRefCedula.putFile(uriSelectedForCedula).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(requireContext(), "Failed to upload cedula. Please try again.", Toast.LENGTH_SHORT).show();
                                     btnSubmitVerification.setEnabled(true);
                                 }
-                                else if (task.isSuccessful()) {
-                                    refRequest.set(clearanceRequest)
+                                else if (task.isSuccessful()) {*/
+                                    /*refRequest.set(clearanceRequest)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
@@ -315,15 +319,15 @@ public class FormClearanceFragment extends Fragment {
                                                     Toast.makeText(requireContext(), "Failed to submit verification. Please try again.", Toast.LENGTH_SHORT).show();
                                                     btnSubmitVerification.setEnabled(true);
                                                 }
-                                            });
-                                }
+                                            });*/
+                                /*}
                             }
-                        });
-                    }
+                        })*/;
+            /*        }
                 }
-            });
+            });*/
         }
-        else {
+        /*else {
             refRequest.set(clearanceRequest)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -337,7 +341,20 @@ public class FormClearanceFragment extends Fragment {
                             btnSubmit.setEnabled(true);
                         }
                     });
-        }
+        }*/
+        refRequest.set(clearanceRequest)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        requireActivity().onBackPressed();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        btnSubmit.setEnabled(true);
+                    }
+                });
     }
 
     private void selectImageFromDevice() {

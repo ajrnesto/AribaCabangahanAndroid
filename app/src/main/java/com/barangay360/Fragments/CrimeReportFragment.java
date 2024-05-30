@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -51,7 +52,7 @@ public class CrimeReportFragment extends Fragment implements IncidentsAdapter.On
     ArrayList<Incident> arrIncidents;
     IncidentsAdapter incidentsCrimes;
     IncidentsAdapter.OnIncidentsListener onIncidentsListener = this;
-
+    TextView tvEmpty;
 
     RecyclerView rvIncidentReports;
 
@@ -72,6 +73,7 @@ public class CrimeReportFragment extends Fragment implements IncidentsAdapter.On
         rvIncidentReports = view.findViewById(R.id.rvIncidentReports);
         btnReportCrime = view.findViewById(R.id.btnReportCrime);
         tlIncidentReports = view.findViewById(R.id.tlIncidentReports);
+        tvEmpty = view.findViewById(R.id.tvEmpty);
     }
 
     private void loadRecyclerView(int tabIndex) {
@@ -113,9 +115,21 @@ public class CrimeReportFragment extends Fragment implements IncidentsAdapter.On
 
                 if (arrIncidents.isEmpty()) {
                     rvIncidentReports.setVisibility(View.GONE);
+                    tvEmpty.setVisibility(View.VISIBLE);
+                    tvEmpty.setVisibility(View.VISIBLE);
+                    if (tlIncidentReports.getSelectedTabPosition() == 0) {
+                        tvEmpty.setText("You have no pending crime reports");
+                    }
+                    else if (tlIncidentReports.getSelectedTabPosition() == 1) {
+                        tvEmpty.setText("You have no reports under investigation");
+                    }
+                    else if (tlIncidentReports.getSelectedTabPosition() == 2) {
+                        tvEmpty.setText("You have no resolved reports");
+                    }
                 }
                 else {
                     rvIncidentReports.setVisibility(View.VISIBLE);
+                    tvEmpty.setVisibility(View.GONE);
                 }
             }
         });

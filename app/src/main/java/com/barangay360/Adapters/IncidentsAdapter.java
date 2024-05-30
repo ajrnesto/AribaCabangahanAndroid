@@ -12,9 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.barangay360.Objects.Incident;
 import com.barangay360.Objects.InvolvedPerson;
 import com.barangay360.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,8 +60,22 @@ public class IncidentsAdapter extends RecyclerView.Adapter<IncidentsAdapter.inci
         String status = incidents.getStatus();
 
         holder.tvIncidentType.setText(incidentType);
+        loadUserName(holder, userUid);
         loadTimestamp(holder, timestamp);
         loadStatus(holder, status);
+    }
+
+    private void loadUserName(incidentsViewHolder holder, String userUid) {
+        DB.collection("users").document(userUid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot userSnap = task.getResult();
+
+                        holder.tvName.setText(userSnap.getString("firstName") + " " + userSnap.getString("lastName"));
+                    }
+                });
     }
 
     private void loadTimestamp(incidentsViewHolder holder, long timestamp) {
@@ -101,7 +119,7 @@ public class IncidentsAdapter extends RecyclerView.Adapter<IncidentsAdapter.inci
     public class incidentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         OnIncidentsListener onIncidentsListener;
-        TextView tvTimestamp, tvIncidentType, tvStatus;
+        TextView tvTimestamp, tvIncidentType, tvName, tvStatus;
         MaterialButton btnCancel;
 
         public incidentsViewHolder(@NonNull View itemView, OnIncidentsListener onIncidentsListener) {
@@ -109,6 +127,7 @@ public class IncidentsAdapter extends RecyclerView.Adapter<IncidentsAdapter.inci
 
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
             tvIncidentType = itemView.findViewById(R.id.tvIncidentType);
+            tvName = itemView.findViewById(R.id.tvName);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             btnCancel = itemView.findViewById(R.id.btnCancel);
 

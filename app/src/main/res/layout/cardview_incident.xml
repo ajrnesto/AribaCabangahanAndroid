@@ -11,12 +11,11 @@
         android:id="@+id/tvIncidentType"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/gabarito_medium"
         android:layout_marginTop="16dp"
-        android:textColor="?colorPrimary"
         android:layout_marginEnd="16dp"
+        android:fontFamily="@font/gabarito_medium"
+        android:textColor="?colorPrimary"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvTimestamp"
         app:layout_constraintEnd_toEndOf="@+id/btnCancel"
         app:layout_constraintEnd_toStartOf="@+id/btnCancel"
         app:layout_constraintHorizontal_bias="0.5"
@@ -26,16 +25,30 @@
         tools:text="LASTNAME_DOCTYPE" />
 
     <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/gabarito_regular"
+        android:textSize="14sp"
+        android:textColor="?colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/btnCancel"
+        app:layout_constraintEnd_toStartOf="@+id/btnCancel"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/tvIncidentType"
+        app:layout_constraintTop_toBottomOf="@+id/tvIncidentType"
+        tools:text="LASTNAME_DOCTYPE" />
+
+    <TextView
         android:id="@+id/tvTimestamp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:fontFamily="@font/gabarito_regular"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvStatus"
         app:layout_constraintEnd_toStartOf="@+id/btnCancel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvIncidentType"
+        app:layout_constraintTop_toBottomOf="@+id/tvName"
         tools:text="23 Feb 2022, 07:23 AM" />
 
     <TextView
@@ -43,7 +56,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="@font/gabarito_bold"
         android:textSize="14sp"
@@ -70,7 +82,6 @@
         android:id="@+id/materialDivider"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/btnCancel"

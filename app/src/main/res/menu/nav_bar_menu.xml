@@ -10,13 +10,22 @@
             android:icon="@drawable/file_lines_solid"
             android:title="Document Requests" />
 
-        <item android:id="@+id/miIncidentReport"
+        <item android:id="@+id/miCrimesIncidents"
+            android:icon="@drawable/flag_solid"
+            android:title="Crimes/Incidents" />
+
+
+        <item android:id="@+id/miBlotter"
+            android:icon="@drawable/flag_solid"
+            android:title="Blotter" />
+
+        <!--<item android:id="@+id/miIncidentReport"
             android:icon="@drawable/flag_solid"
             android:title="Incident Report" />
 
         <item android:id="@+id/miCrimeReport"
             android:icon="@drawable/handcuffs_solid"
-            android:title="Crime Report" />
+            android:title="Crime Report" />-->
 
         <!--item android:id="@+id/miAboutUs"
             android:icon="@drawable/handcuffs_solid"

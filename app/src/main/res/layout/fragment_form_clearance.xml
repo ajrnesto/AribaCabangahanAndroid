@@ -61,7 +61,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="First Name"
+                    android:hint="First Name*"
                     android:inputType="textCapCharacters" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -105,7 +105,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="Last Name"
+                    android:hint="Last Name*"
                     android:inputType="textCapCharacters" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -115,7 +115,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-
                 app:boxBackgroundColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -127,7 +126,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="Civil Status"
+                    android:hint="Civil Status*"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -150,7 +149,7 @@
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
                     android:focusable="false"
-                    android:hint="Birthday"
+                    android:hint="Birthday*"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -183,7 +182,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="Purok"
+                    android:hint="Purok*"
                     android:inputType="textCapCharacters" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -252,7 +251,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="Residency Status"
+                    android:hint="Address Type*"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -269,7 +268,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPurpose"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox"
+                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -278,15 +277,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPurpose"
-                    style="@style/Widget.Material3.TextInputEditText.FilledBox"
+                <AutoCompleteTextView
+                    android:id="@+id/menuPurpose"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="14dp"
                     android:fontFamily="@font/gabarito_regular"
-                    android:hint="Purpose"
-                    android:inputType="textCapSentences" />
+                    android:hint="Purpose*"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <RadioGroup
@@ -319,7 +317,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/gabarito_regular"
-                android:text="Submit Request Form"
+                android:text="Submit Form"
                 app:layout_constraintEnd_toEndOf="@+id/tilPurpose"
                 app:layout_constraintStart_toStartOf="@+id/tilPurpose"
                 app:layout_constraintTop_toBottomOf="@+id/rgResident" />
